@@ -1701,6 +1701,15 @@ async function setCodeBlock(params) {
   if (node.type !== "CODE_BLOCK") {
     throw new Error(`Node is not a code block: ${nodeId} (${node.type})`);
   }
+  // FigJam renders code blocks in Source Code Pro; writing `code` requires
+  // the fonts to be loaded first, like any text edit.
+  await Promise.all(
+    ["Regular", "Medium", "Bold"].map((style) =>
+      figma
+        .loadFontAsync({ family: "Source Code Pro", style })
+        .catch(() => {})
+    )
+  );
   node.code = code;
   if (codeLanguage) node.codeLanguage = codeLanguage;
   return {
